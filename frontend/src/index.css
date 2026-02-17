@@ -1,0 +1,135 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Courier New', monospace;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #0a0a0a;
+  color: #e0e0e0;
+}
+
+/* Custom scrollbar - Dark theme */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #141414;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #00ff41;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #00cc33;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes glitch {
+  0%, 100% { transform: translate(0); }
+  33% { transform: translate(-2px, 2px); }
+  66% { transform: translate(2px, -2px); }
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.glitch {
+  animation: glitch 1s infinite;
+}
+
+/* Backtrace terminal-style buttons */
+.btn-terminal {
+  @apply bg-dark-surface text-neon-green px-6 py-3 rounded border-2 border-neon-green 
+         font-mono font-semibold hover:bg-neon-green hover:text-black 
+         transition-all duration-200 focus:ring-2 focus:ring-neon-green 
+         active:scale-95 uppercase tracking-wider;
+}
+
+.btn-terminal-cyan {
+  @apply bg-dark-surface text-neon-cyan px-6 py-3 rounded border-2 border-neon-cyan 
+         font-mono font-semibold hover:bg-neon-cyan hover:text-black 
+         transition-all duration-200 focus:ring-2 focus:ring-neon-cyan 
+         active:scale-95 uppercase tracking-wider;
+}
+
+.btn-terminal-blue {
+  @apply bg-dark-surface text-neon-blue px-6 py-3 rounded border-2 border-neon-blue 
+         font-mono font-semibold hover:bg-neon-blue hover:text-black 
+         transition-all duration-200 focus:ring-2 focus:ring-neon-blue 
+         active:scale-95 uppercase tracking-wider;
+}
+
+.btn-terminal-danger {
+  @apply bg-dark-surface text-red-500 px-6 py-3 rounded border-2 border-red-500 
+         font-mono font-semibold hover:bg-red-500 hover:text-black 
+         transition-all duration-200 focus:ring-2 focus:ring-red-500 
+         active:scale-95 uppercase tracking-wider;
+}
+
+/* Terminal input */
+.input-terminal {
+  @apply bg-dark-surface text-neon-green border-2 border-neon-green 
+         px-4 py-3 rounded font-mono focus:ring-2 focus:ring-neon-green 
+         focus:border-neon-cyan outline-none transition-all;
+}
+
+/* Scanline effect */
+.scanline {
+  position: relative;
+  overflow: hidden;
+}
+
+.scanline::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(transparent, #00ff41);
+  animation: scanline 3s linear infinite;
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+/* Neon glow text */
+.neon-text {
+  text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor;
+}
+
+/* Grid pattern background */
+.grid-bg {
+  background-image: 
+    linear-gradient(rgba(0, 255, 65, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 65, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
