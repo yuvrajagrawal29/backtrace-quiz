@@ -470,25 +470,83 @@ app.get('/api/admin/participants', async (req, res) => {
 });
 
 // ============================================
-// ADMIN: Seed Database (ONE-TIME USE)
+// ADMIN: Seed Database Endpoint
 // ============================================
 app.post('/api/admin/seed', async (req, res) => {
   try {
-    // Import the seed function
-    const seedDatabase = require('./seedQuestions');
+    console.log('🌱 Starting database seed via API...');
     
-    await seedDatabase();
+    // Import Question model (already imported at top)
+    // const Question = require('./models/Question');
     
+    // Clear existing questions
+    const deletedCount = await Question.deleteMany({});
+    console.log(`🗑️ Cleared ${deletedCount.deletedCount || 0} existing questions`);
+
+    // Generate questions using the existing function
+    const backtraceQuestions = [
+      { q: "Room Light Automation: Person enters room → Light turns ON, Person leaves room → Light turns OFF. Which components are needed?", opts: ["Motion Sensor, Controller, Light", "Temperature Sensor, Controller, Light", "Motion Sensor, Speaker, Light", "Camera, Controller, Light"], ans: 0 },
+      { q: "Automatic Hand Sanitizer: Hand placed → Sanitizer dispensed. Which components are needed?", opts: ["IR Sensor, Pump Motor, Controller", "Motion Sensor, Pump Motor, Controller", "IR Sensor, Display Screen, Controller", "Camera, Pump Motor, Controller"], ans: 0 },
+      { q: "Mobile Phone Unlock (PIN): Enter PIN → Phone unlocks. Which components are needed?", opts: ["Keypad, Authentication Logic, Display, Storage", "Keypad, Speaker, Display, Storage", "Camera, Authentication Logic, Display, Storage", "Keypad, Authentication Logic, Speaker, Storage"], ans: 0 },
+      { q: "Lift System: Press floor button → Lift moves → Door opens. Which components are needed?", opts: ["Button Panel, Motor, Controller, Door Mechanism", "Button Panel, Speaker, Controller, Door Mechanism", "Camera, Motor, Controller, Door Mechanism", "Button Panel, Motor, Display, Door Mechanism"], ans: 0 },
+      { q: "Online Login System: Enter credentials → Login success/failure. Which components are needed?", opts: ["Input Form, Database, Authentication Logic, Display", "Input Form, Printer, Authentication Logic, Display", "Input Form, Database, Speaker, Display", "Camera, Database, Authentication Logic, Display"], ans: 0 },
+      { q: "Traffic Signal: Red → Yellow → Green → Red. Which components are needed?", opts: ["Timer, Controller, Signal Lights, Power Supply", "Timer, Camera, Signal Lights, Power Supply", "Timer, Controller, Display, Power Supply", "Motion Sensor, Controller, Signal Lights, Power Supply"], ans: 0 },
+      { q: "Smart Door Lock: Fingerprint scanned → Door unlocks. Which components are needed?", opts: ["Fingerprint Sensor, Controller, Lock Motor", "Fingerprint Sensor, Display, Lock Motor", "Temperature Sensor, Controller, Lock Motor", "Fingerprint Sensor, Controller, Speaker"], ans: 0 },
+      { q: "ATM Withdrawal: Insert card → Enter PIN → Cash dispensed. Which components are needed?", opts: ["Card Reader, Keypad, Bank Server, Cash Dispenser", "Card Reader, Keypad, Bank Server, Speaker", "Card Reader, Display, Bank Server, Cash Dispenser", "Camera, Keypad, Bank Server, Cash Dispenser"], ans: 0 },
+      { q: "Automatic Street Light: Night → Light ON, Day → Light OFF. Which components are needed?", opts: ["LDR Sensor, Controller, Light, Power Unit", "Motion Sensor, Controller, Light, Power Unit", "LDR Sensor, Display, Light, Power Unit", "LDR Sensor, Controller, Camera, Power Unit"], ans: 0 },
+      { q: "File Upload System: Click Upload → Progress bar → Success. Which components are needed?", opts: ["UI Button, Backend Server, Storage, Progress Indicator", "UI Button, Backend Server, Camera, Progress Indicator", "UI Button, Printer, Storage, Progress Indicator", "Display, Backend Server, Storage, Progress Indicator"], ans: 0 },
+    ];
+
+    const questionsToInsert = [];
+    
+    // Generate 500 questions
+    for (let i = 0; i < 500; i++) {
+      const base = backtraceQuestions[i % backtraceQuestions.length];
+      let difficulty;
+      if (i < 150) difficulty = 'easy';
+      else if (i < 300) difficulty = 'medium';
+      else difficulty = 'hard';
+      
+      questionsToInsert.push({
+        questionNumber: i + 1,
+        question: base.q + ` (Q${i+1})`,
+        options: base.opts,
+        correctAnswer: base.ans,
+        category: 'general',
+        difficulty: difficulty
+      });
+    }
+
+    console.log(`📝 Generated ${questionsToInsert.length} questions`);
+
+    // Insert all questions
+    const result = await Question.insertMany(questionsToInsert);
+    console.log(`✅ Inserted ${result.length} questions`);
+
+    // Verify count
+    const finalCount = await Question.countDocuments();
+    console.log(`📊 Total questions in database: ${finalCount}`);
+
     res.json({
       success: true,
-      message: 'Database seeded successfully with 500 questions'
+      message: 'Database seeded successfully',
+      data: {
+        questionsSeeded: finalCount,
+        breakdown: {
+          easy: questionsToInsert.filter(q => q.difficulty === 'easy').length,
+          medium: questionsToInsert.filter(q => q.difficulty === 'medium').length,
+          hard: questionsToInsert.filter(q => q.difficulty === 'hard').length
+        }
+      }
     });
+
   } catch (error) {
-    console.error('Seed error:', error);
+    console.error('❌ Seed error:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to seed database',
-      error: error.message
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 });
