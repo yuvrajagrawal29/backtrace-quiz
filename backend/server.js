@@ -470,6 +470,30 @@ app.get('/api/admin/participants', async (req, res) => {
 });
 
 // ============================================
+// ADMIN: Seed Database (ONE-TIME USE)
+// ============================================
+app.post('/api/admin/seed', async (req, res) => {
+  try {
+    // Import the seed function
+    const seedDatabase = require('./seedQuestions');
+    
+    await seedDatabase();
+    
+    res.json({
+      success: true,
+      message: 'Database seeded successfully with 500 questions'
+    });
+  } catch (error) {
+    console.error('Seed error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to seed database',
+      error: error.message
+    });
+  }
+});
+
+// ============================================
 // HEALTH CHECK
 // ============================================
 app.get('/api/health', (req, res) => {

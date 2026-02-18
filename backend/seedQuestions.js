@@ -137,5 +137,10 @@ const seedDatabase = async () => {
   }
 };
 
-// Run the seed
-seedDatabase();
+// Export for API use
+module.exports = seedDatabase;
+
+// Run only if called directly
+if (require.main === module) {
+  seedDatabase();
+}
